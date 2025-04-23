@@ -229,11 +229,11 @@ namespace Inventory_Management.Managers
         }
 
         // Hash password
-        public void HashPassword(User user)
+        private void HashPassword(User user)
         {
             if (user == null)
             {
-                throw new ArgumentNullException(nameof(user), "User cannot be null");
+                throw new ArgumentNullException(nameof(user), "User cannot be null when hashing password");
             }
 
             if (string.IsNullOrWhiteSpace(user.Password))
