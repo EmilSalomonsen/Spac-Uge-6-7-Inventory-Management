@@ -1,4 +1,6 @@
-import axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse } from 'axios';
+import axios, { type AxiosError, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios';
+import Cookies from 'js-cookie';
+import { SESSION_COOKIE_NAME } from '@/pages/auth/services/AuthService';
 
 const client = axios.create({
     baseURL: 'http://localhost:5059/api',
@@ -26,50 +28,33 @@ export const request = async (options: AxiosRequestConfig) => {
 };
 
 
-// client.interceptors.request.use(
-//     (config: InternalAxiosRequestConfig) => {
-//         // const accessToken = localStorage.getItem(STORAGE_TOKEN.ACCESS_TOKEN);
-//         // if (accessToken) {
-//         //     config.headers.Authorization = `Bearer ${accessToken}`;
-//         // }
-//         return config;
-//     },
-//     (error: AxiosError) => {
-//         return Promise.reject(error);
-//     },
-// );
+client.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+        const token = Cookies.get(SESSION_COOKIE_NAME);
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error: AxiosError) => {
+        return Promise.reject(error);
+    },
+);
 
-// client.interceptors.response.use(
-//     (res: AxiosResponse) => {
-//         return res; // Simply return the response
-//     },
-//     async (err) => {
-//         const status = err.response ? err.response.status : null;
-//         // if (status === 401) {
-//         //     try {
-//         //         const refreshTokenFromStorage = localStorage.getItem(
-//         //             STORAGE_TOKEN.REFRESH_TOKEN
-//         //         );
-//         //         const { accessToken, refreshToken } = await AuthService.refresh(
-//         //             refreshTokenFromStorage
-//         //         );
+client.interceptors.response.use(
+    (res: AxiosResponse) => {
+        return res;
+    },
+    async (err) => {
+        const status = err.response ? err.response.status : null;
 
-//         //         LocalStorageService.setTokens(accessToken, refreshToken);
-//         //         client.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+        if (status === 403 && err.response.data) {
+            return Promise.reject(err.response.data);
+        }
 
-//         //         return await client(originalConfig);
-//         //     } catch (error: AxiosError) {
-//         //         return Promise.reject(error);
-//         //     }
-//         // }
-
-//         if (status === 403 && err.response.data) {
-//             return Promise.reject(err.response.data);
-//         }
-
-//         return Promise.reject(err);
-//     }
-// );
+        return Promise.reject(err);
+    }
+);
 
 export default client;
 

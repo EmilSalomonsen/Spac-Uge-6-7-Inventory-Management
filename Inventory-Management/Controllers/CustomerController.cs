@@ -1,6 +1,8 @@
 ﻿using Inventory_Management.Managers;
 using Inventory_Management.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Inventory_Management.Controllers
 {
@@ -17,16 +19,25 @@ namespace Inventory_Management.Controllers
 
         // GET: api/customer
         [HttpGet]
-        public async Task<IActionResult> GetAllCustomers()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllCustomers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 40)
         {
             try
             {
-                var customers = await _customerManager.GetAllCustomersAsync();
+                var (customers, totalCount) = await _customerManager.GetAllCustomersAsync(pageNumber, pageSize);
                 if (customers == null || !customers.Any())
                 {
                     return NotFound("No customers found");
                 }
-                return Ok(customers);
+
+                return Ok(new
+                {
+                    Customers = customers,
+                    TotalCount = totalCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+                });
             }
             catch (Exception ex)
             {
@@ -36,6 +47,7 @@ namespace Inventory_Management.Controllers
 
         // GET: api/customer/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
             try

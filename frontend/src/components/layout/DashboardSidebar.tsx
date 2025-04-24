@@ -32,9 +32,21 @@ export const DashboardSidebar: React.FC = () => {
         },
         {
             label: "Orders",
+            items: [
+                {
+                    label: "Orders",
+                    url: "/orders"
+                }
+            ]
         },
         {
             label: "Customers",
+            items: [
+                {
+                    label: "Customers",
+                    url: "/customers"
+                }
+            ]
         }
     ];
 

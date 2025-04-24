@@ -38,16 +38,34 @@ namespace Inventory_Management.Managers
             }
         }
 
-        public async Task<List<Customer>> GetAllCustomersAsync()
+        public async Task<(List<Customer> Customers, int TotalCount)> GetAllCustomersAsync(int pageNumber = 1, int pageSize = 40)
         {
             try
             {
-                var customers = await _context.Customers.ToListAsync();
+                if (pageNumber <= 0)
+                {
+                    throw new ArgumentException("Page number must be greater than zero", nameof(pageNumber));
+                }
+                if (pageSize <= 0)
+                {
+                    throw new ArgumentException("Page size must be greater than zero", nameof(pageSize));
+                }
+
+                // Get total count
+                int totalCount = await _context.Customers.CountAsync();
+
+                // Get paginated customers
+                var customers = await _context.Customers
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
                 if (customers == null || !customers.Any())
                 {
                     throw new InvalidOperationException("No customers found");
                 }
-                return customers;
+
+                return (customers, totalCount);
             }
             catch (DbUpdateException ex)
             {

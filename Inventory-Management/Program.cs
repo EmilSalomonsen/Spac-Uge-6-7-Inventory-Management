@@ -53,7 +53,9 @@ Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection")
 var AllowSpecificOrigins = "AllowFrontendOrigin";
 builder.Services.AddCors(o => o.AddPolicy(AllowSpecificOrigins, builder =>
 {
-    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
 }));
 
 // Add services to the container.

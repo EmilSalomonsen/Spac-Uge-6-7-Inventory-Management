@@ -47,20 +47,43 @@ export type OrderItemDto = {
     quantity: number;
 };
 
-export type Order = {
+export interface Order {
     orderId: number;
     customerId: number;
     orderDate: string;
-    paymentMethod?: string;
-    orderItems?: OrderItem[];
-};
+    paymentMethod: string;
+    orderStatus: OrderStatus;
+    orderItems: OrderItem[];
+}
 
-export type OrderItem = {
+export enum OrderStatus {
+    Pending = 0,
+    Completed = 1,
+    Cancelled = 2
+}
+
+export interface OrderItem {
     orderItemId: number;
     orderId: number;
     productId: number;
     quantity: number;
-};
+    product?: Product;
+}
+
+export interface AllOrdersResponse {
+    orders: Order[];
+    totalCount: number;
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+}
+
+export interface OrderQueryParams {
+    customerId?: number;
+    orderStatus?: OrderStatus;
+    startDate?: string;
+    endDate?: string;
+}
 
 export type ApiError = {
     message: string;
@@ -88,3 +111,16 @@ export type Credentials = {
     username: string,
     password: string;
 };
+
+export interface Customer {
+    customerId: number;
+    city: string;
+}
+
+export interface AllCustomersResponse {
+    customers: Customer[];
+    totalPages: number;
+    currentPage: number;
+    pageSize: number;
+    totalCount: number;
+}

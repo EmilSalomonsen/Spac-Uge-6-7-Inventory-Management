@@ -31,9 +31,11 @@ namespace Inventory_Management.Controllers
                 return BadRequest("No orders found");
             }
 
+            var orderDtos = orders.Select(order => OrderResponseDto.FromOrder(order)).ToList();
+
             return Ok(new
             {
-                Orders = orders,
+                Orders = orderDtos,
                 TotalCount = totalCount,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
@@ -52,7 +54,7 @@ namespace Inventory_Management.Controllers
                 {
                     return NotFound("Order not found");
                 }
-                return Ok(order);
+                return Ok(OrderResponseDto.FromOrder(order));
             }
             catch (Exception ex)
             {
@@ -66,12 +68,13 @@ namespace Inventory_Management.Controllers
         {
             try
             {
-                var customer = await _orderManager.GetOrdersByCustomerIdAsync(customerId);
-                if (customer == null)
+                var orders = await _orderManager.GetOrdersByCustomerIdAsync(customerId);
+                if (orders == null)
                 {
                     return NotFound("Customer not found");
                 }
-                return Ok(customer);
+                var orderDtos = orders.Select(order => OrderResponseDto.FromOrder(order)).ToList();
+                return Ok(orderDtos);
             }
             catch (Exception ex)
             {

@@ -15,6 +15,11 @@ import { DashboardNavbar } from '@/components/layout/DashboardNavbar';
 import { LoginForm } from '@/pages/auth/components/LoginForm';
 import { authLoader, loginLoader } from '@/pages/auth/utils/loaders';
 import { LogoutPage } from '@/pages/auth/components/LogoutPage';
+import { OrderDetail } from "./pages/orders/components/OrderDetail";
+import { OrdersList } from './pages/orders/components/OrdersList';
+import { CustomersList } from './pages/customers/components/CustomersList';
+import { CustomerDetail } from './pages/customers/components/CustomerDetail';
+import DashboardPage from './pages/dashboard';
 
 const RootLayout: React.FC = () => (
     <SidebarProvider>
@@ -45,17 +50,29 @@ const router = createBrowserRouter([
         Component: RootLayout,
         loader: authLoader,
         children: [
-            // Default redirect to /products
+            // Default redirect to /dashboard
             {
                 index: true,
-                loader: async () => redirect("/products"),
+                loader: async () => redirect("/dashboard"),
             },
+            // Dashboard route
+            { path: "dashboard", Component: DashboardPage },
             // Product routes
             { path: "products", Component: ProductList },
             { path: "products/:id", Component: ProductDetail },
             { path: "products/categories", Component: ProductCategoriesList },
             { path: "products/categories/:id", Component: ProductCategoryDetail },
-            { path: "logout", Component: LogoutPage }
+            { path: "logout", Component: LogoutPage },
+            { path: "orders", Component: OrdersList },
+            { path: "orders/:id", Component: OrderDetail },
+            {
+                path: "customers",
+                element: <CustomersList />,
+            },
+            {
+                path: "customers/:id",
+                element: <CustomerDetail />,
+            },
         ],
     },
     { path: "login", Component: LoginForm, loader: loginLoader },
